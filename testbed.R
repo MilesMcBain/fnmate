@@ -6,9 +6,21 @@ drake_plan(
 
   target3 = do_the_thing(arg1,
                          arg2,
-                         arg3,
-                         func3(arg4))
+                         func3(arg4),
+                         arg3),
 
-  texty_one = fn3("text", "\"text in text\"")
+  texty_one = fn3("text", "\"text in text\""),
+
+  targ = a_thing(arg1, arg2),
+
+
+
+
+
+
+
+
+
+
 
 )
