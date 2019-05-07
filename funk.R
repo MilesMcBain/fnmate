@@ -1,3 +1,14 @@
+funkey <- function(text, index){
+  target <- locate_funkey_target(text, index)
+
+  expression <- as.list(rlang::parse_expr(target))
+
+  fn_name <- expression[[1]]
+  fn_args <- expression[-1]
+  fn_arg_names <- names(expression[-1])
+
+}
+
 locate_funkey_target <- function(text, index){
 
   function_open_pattern <- "[A-Za-z.][A-Za-z0-9_.]+\\s*\\("
@@ -23,10 +34,15 @@ locate_funkey_target <- function(text, index){
   match_row_col <-
     match_row_col[candidates]
 
+  index_row_col <- index_to_row_col(text, index)
+
   funkey_candidate_spans <-
     funkey_candidate_spans %>%
-    purrr::discard(is.null) %>%
-    purrr::map2(match_row_col,
+    purrr::discard(is.null)
+
+  funkey_candidate_text_coords <- 
+    purrr::map2(funkey_candidate_spans,
+                match_row_col,
          function(candidate_span, candidate_index){
            candidate_span$line1 <-
             candidate_index$row
@@ -37,12 +53,26 @@ locate_funkey_target <- function(text, index){
            candidate_span$col2 <-
              ifelse(candidate_span$line1 == candidate_span$line2,
                     candidate_span$col2 + candidate_index$col -1,
-                    candidate_index$col)
-
+                    candidate_span$col2)
            candidate_span
          })
 
+  funkey_target_location <-
+    funkey_candidate_text_coords %>%
+    purrr::keep(~span_contains(.x, index_row_col)) %>%
+    tail(1)
 
+  if (length(funkey_target_location) == 0) stop("funkey couldn't find a parsable function at cursor.")
+
+  funkey_target_location <- funkey_target_location[[1]]
+
+  substring(text,
+            row_col_to_index(text,
+                             funkey_target_location$line1,
+                             funkey_target_location$col1),
+            row_col_to_index(text,
+                             funkey_target_location$line2,
+                             funkey_target_location$col2))
 }
 
 parse_safely <- purrr::safely(parse)
@@ -73,9 +103,24 @@ index_to_row_col <- function(text, index){
   line_num <- sum((line_ends < index)) + 1
   ## + 1 since first line doesn't have a \n before it.
 
-  col_num <- index - max(max(line_ends[line_ends < index]), 0)
-  ## if there are no line ends inner max returns -inf
+  col_num <- suppressWarnings(
+    index - max(max(line_ends[line_ends < index]), 0)
+  )  ## if there are no line ends inner max returns -inf
 
   list(row = line_num, col = col_num)
 
+}
+
+row_col_to_index <- function(text, row, col){
+  line_end_locs <- gregexpr("\\n", text)[[1]]
+  ifelse(row == 1,
+         col,
+         line_end_locs[row - 1] + col)
+}
+
+span_contains <- function(span, index){
+  span$line1 <= index$row &&
+    span$line2 >= index$row &&
+    span$col1 <= index$col &&
+    span$col2 >= index$col
 }
