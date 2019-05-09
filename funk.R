@@ -1,4 +1,4 @@
-funkey <- function(text, index){
+funkey <- function(text, index, external = TRUE) {
   target <- locate_funkey_target(text, index)
 
   expression <- as.list(rlang::parse_expr(target))
@@ -6,10 +6,71 @@ funkey <- function(text, index){
   fn_name <- expression[[1]]
   fn_args <- expression[-1]
   fn_arg_names <- names(expression[-1])
+  fn_arg_classes <- purrr::map_chr(fn_args, class)
+
+  ## args that are just values or calls need to have names generated.
+  unnamed_args <- fn_arg_classes != "name" & fn_arg_names == ""
+  name_is_arg <- fn_arg_classes == "name" & fn_arg_names == ""
+  fn_arg_names[unnamed_args] <- paste0("nameme", seq(sum(unnamed_args)))
+  fn_arg_names[name_is_arg] <- as.character(fn_args[name_is_arg])
+  fn_arg_list <-
+    purrr::pmap_chr(list(name = fn_arg_names,
+                         arg = fn_args,
+                         name_is_arg = name_is_arg),
+                    function(name,
+                             arg,
+                             name_is_arg) {
+                      if (!name_is_arg) paste0(name, " = ", deparse(arg))
+                      else name
+                    })
+
+  body <- build_fn_body(fn_name, fn_arg_list)
+  roxygen <- ifelse(external,
+                    build_external_roxygen(fn_arg_names),
+                    build_internal_roxygen()
+                    )
+
+ fn_text <- paste0(c(roxygen, body), collapse = "\n")
 
 }
 
-locate_funkey_target <- function(text, index){
+build_fn_body <- function(fn_name, fn_arg_list) {
+
+  glue::glue("{fn_name} <- function({paste0(fn_arg_list, collapse = \", \")}) ",
+             "{{\n\n  NULL\n\n}}\n",
+             .trim = FALSE)
+
+}
+
+build_internal_roxygen <- function() {
+
+  "##' @internal"
+
+}
+
+build_external_roxygen <- function(fn_arg_names) {
+
+  head <- glue::glue(
+                  "##' .. content for \\description{{}} (no empty lines) ..\n",
+                  "##'\n",
+                  "##' .. content for \\details{{}} ..\n",
+                  "##' @title")
+
+  params <-
+    purrr::map_chr(fn_arg_names, ~glue::glue("##' @param {.x}")) %>%
+    paste0(collapse="\n")
+
+  tail <-
+    glue::glue(
+    "##' @return\n",
+    "##' @author {system(\"git config user.name\", intern = TRUE)}\n",
+    "##' @external")
+
+  paste0(c(head, params, tail), collapse = "\n")
+
+}
+
+locate_funkey_target <- function(text, index) {
 
   function_open_pattern <- "[A-Za-z.][A-Za-z0-9_.]+\\s*\\("
 
@@ -77,7 +138,7 @@ locate_funkey_target <- function(text, index){
 
 parse_safely <- purrr::safely(parse)
 
-parse_from_idx <- function(text, index){
+parse_from_idx <- function(text, index) {
   target_text <- substring(text, index)
   tstfile = srcfile(tempfile())
   parse_safely(text = target_text,
@@ -86,18 +147,18 @@ parse_from_idx <- function(text, index){
   getParseData(tstfile)
 }
 
-first_fn_expr <- function(parse_data){
+first_fn_expr <- function(parse_data) {
 
   if (!root_is_complete_function(parse_data)) return(NULL)
   first_function_parent_id <- parse_data[1,]
 
 }
 
-root_is_complete_function <- function(parse_data){
+root_is_complete_function <- function(parse_data) {
   parse_data[grepl("SYMBOL", parse_data$token),]$token[[1]] == "SYMBOL_FUNCTION_CALL"
 }
 
-index_to_row_col <- function(text, index){
+index_to_row_col <- function(text, index) {
 
   line_ends<- gregexpr("\\n", text)[[1]]
   line_num <- sum((line_ends < index)) + 1
@@ -111,14 +172,14 @@ index_to_row_col <- function(text, index){
 
 }
 
-row_col_to_index <- function(text, row, col){
+row_col_to_index <- function(text, row, col) {
   line_end_locs <- gregexpr("\\n", text)[[1]]
   ifelse(row == 1,
          col,
          line_end_locs[row - 1] + col)
 }
 
-span_contains <- function(span, index){
+span_contains <- function(span, index) {
   span$line1 <= index$row &&
     span$line2 >= index$row &&
     span$col1 <= index$col &&
