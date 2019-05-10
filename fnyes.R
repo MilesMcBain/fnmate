@@ -1,11 +1,11 @@
-funkey <- function(text, index, external = TRUE) {
-  target <- locate_funkey_target(text, index)
+fn_defn_from_cursor <- function(text, index, external = TRUE) {
+  target <- locate_fn_target(text, index)
 
   expression <- as.list(rlang::parse_expr(target))
 
   fn_name <- expression[[1]]
   fn_args <- expression[-1]
-  fn_arg_names <- names(expression[-1])
+  fn_arg_names <- names(expression[-1]) %||% as.list(rep("", length(fn_args)))
   fn_arg_classes <- purrr::map_chr(fn_args, class)
 
   ## args that are just values or calls need to have names generated.
@@ -17,34 +17,51 @@ funkey <- function(text, index, external = TRUE) {
     purrr::pmap_chr(list(name = fn_arg_names,
                          arg = fn_args,
                          name_is_arg = name_is_arg),
-                    function(name,
-                             arg,
-                             name_is_arg) {
+                    function(name, arg, name_is_arg) {
+
                       if (!name_is_arg) paste0(name, " = ", deparse(arg))
                       else name
+
                     })
 
   body <- build_fn_body(fn_name, fn_arg_list)
-  roxygen <- ifelse(external,
-                    build_external_roxygen(fn_arg_names),
-                    build_internal_roxygen()
-                    )
+  if (external) {
+    roxygen <- build_external_roxygen(fn_arg_names)
+  } else {
+    roxygen <- build_internal_roxygen()
+  }
 
- fn_text <- paste0(c(roxygen, body), collapse = "\n")
+  fn_text <- paste0(c(roxygen, body), collapse = "\n")
+
+  fn_text
 
 }
 
 build_fn_body <- function(fn_name, fn_arg_list) {
 
-  glue::glue("{fn_name} <- function({paste0(fn_arg_list, collapse = \", \")}) ",
-             "{{\n\n  NULL\n\n}}\n",
-             .trim = FALSE)
+  definition <- glue::glue("{fn_name} <- function(")
 
+  args <- paste0(fn_arg_list, collapse = ", ")
+
+  ## wrap in case too wide
+  args <- strwrap(args, width = 80 - nchar(definition))
+
+  ## indent any wrapped lines
+  if (length(args > 1)) {
+    to_indent <- seq_along(args)[-1]
+    args[to_indent] <- paste0(strrep(" ", nchar(definition)),
+                              args[to_indent])
+    args <- paste0(args, collapse = "\n")
+  }
+
+  glue::glue(definition, args, ") {{\n\n  NULL\n\n}}\n",
+             .trim = FALSE)
 }
+
 
 build_internal_roxygen <- function() {
 
-  "##' @internal"
+  NULL
 
 }
 
@@ -62,15 +79,15 @@ build_external_roxygen <- function(fn_arg_names) {
 
   tail <-
     glue::glue(
-    "##' @return\n",
-    "##' @author {system(\"git config user.name\", intern = TRUE)}\n",
-    "##' @external")
+            "##' @return\n",
+            "##' @author {system(\"git config user.name\", intern = TRUE)}\n",
+            "##' @export")
 
   paste0(c(head, params, tail), collapse = "\n")
 
 }
 
-locate_funkey_target <- function(text, index) {
+locate_fn_target <- function(text, index) {
 
   function_open_pattern <- "[A-Za-z.][A-Za-z0-9_.]+\\s*\\("
 
@@ -80,14 +97,14 @@ locate_funkey_target <- function(text, index) {
 
   match_row_col <-
     purrr::map(matches, ~index_to_row_col(text, .x))
-  
-  funkey_candidate_spans <-
+
+  fn_candidate_spans <-
     purrr::map(matches,
                ~parse_from_idx(text, .x)) %>%
     purrr::map(first_fn_expr)
 
   candidates <-
-   !purrr::map_lgl(funkey_candidate_spans, is.null)
+   !purrr::map_lgl(fn_candidate_spans, is.null)
 
   candidate_matches <-
     matches[candidates]
@@ -97,12 +114,12 @@ locate_funkey_target <- function(text, index) {
 
   index_row_col <- index_to_row_col(text, index)
 
-  funkey_candidate_spans <-
-    funkey_candidate_spans %>%
+  fn_candidate_spans <-
+    fn_candidate_spans %>%
     purrr::discard(is.null)
 
-  funkey_candidate_text_coords <- 
-    purrr::map2(funkey_candidate_spans,
+  fn_candidate_text_coords <-
+    purrr::map2(fn_candidate_spans,
                 match_row_col,
          function(candidate_span, candidate_index){
            candidate_span$line1 <-
@@ -118,22 +135,22 @@ locate_funkey_target <- function(text, index) {
            candidate_span
          })
 
-  funkey_target_location <-
-    funkey_candidate_text_coords %>%
+  fn_target_location <-
+    fn_candidate_text_coords %>%
     purrr::keep(~span_contains(.x, index_row_col)) %>%
     tail(1)
 
-  if (length(funkey_target_location) == 0) stop("funkey couldn't find a parsable function at cursor.")
+  if (length(fn_target_location) == 0) stop("fnyes couldn't find a parsable function at cursor.")
 
-  funkey_target_location <- funkey_target_location[[1]]
+  fn_target_location <- fn_target_location[[1]]
 
   substring(text,
             row_col_to_index(text,
-                             funkey_target_location$line1,
-                             funkey_target_location$col1),
+                             fn_target_location$line1,
+                             fn_target_location$col1),
             row_col_to_index(text,
-                             funkey_target_location$line2,
-                             funkey_target_location$col2))
+                             fn_target_location$line2,
+                             fn_target_location$col2))
 }
 
 parse_safely <- purrr::safely(parse)
@@ -185,3 +202,5 @@ span_contains <- function(span, index) {
     span$col1 <= index$col &&
     span$col2 >= index$col
 }
+
+`%||%` <- function(x, y) if (is.null(x)) y else x
