@@ -1,3 +1,18 @@
+globalVariables(".fnmate_env")
+.fnmate_env <- new.env()
+
+
+fnmate_fn.R <- function(text, index) {
+  fnmate_target <- fn_defn_from_cursor(text, index, external = TRUE)
+  write_fn_file(fnmate_target$fn_name,
+                fnmate_target$fn_defn)
+
+}
+
+fnmate_local <- function(text, index) {
+  fn_defn_from_cursor(text, index, external = FALSE)$fn_text
+}
+
 fn_defn_from_cursor <- function(text, index, external = TRUE) {
   target <- locate_fn_target(text, index)
 
@@ -33,8 +48,30 @@ fn_defn_from_cursor <- function(text, index, external = TRUE) {
 
   fn_text <- paste0(c(roxygen, body), collapse = "\n")
 
-  fn_text
+  list(fn_name = fn_name,
+       fn_defn = fn_text)
+}
 
+write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder") %||% "R") {
+
+  if (!dir.exists(fn_folder)) dir.create(fn_folder, recursive = TRUE)
+
+  target_file <- file.path(fn_folder,paste0(fn_name,".R"))
+
+  ## If file already exists, bail without writing, but set it up so that if user
+  ## calls again existing file will be overwritten.
+  if (file.exists(target_file) &&
+      (.fnmate_env$previous_call %||% "") != fn_name) {
+    .fnmate_env$previous_call = fn_name
+    message(target_file, " already exists. Call fnmate again on this function to overwrite file.")
+    return(NULL)
+  }
+
+  readr::write_file(x = fn_defn, path = target_file)
+  message("fnmate Wrote ", target_file)
+  .fnmate_env$previous_call <- NULL
+
+  invisible(fn_defn)
 }
 
 build_fn_body <- function(fn_name, fn_arg_list) {
@@ -54,7 +91,9 @@ build_fn_body <- function(fn_name, fn_arg_list) {
     args <- paste0(args, collapse = "\n")
   }
 
-  glue::glue(definition, args, ") {{\n\n  NULL\n\n}}\n",
+  content <- getOption("fnmate_placeholder") %||% "NULL"
+
+  glue::glue(definition, args, ") {{\n\n  {content}\n\n}}\n",
              .trim = FALSE)
 }
 

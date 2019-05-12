@@ -1,0 +1,64 @@
+---
+title: "Using fnmate with ESS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using fnmate with ESS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Here is your lisp
+
+```
+(defun exec-r-fn-with-text (r_fn text)
+  (let ((escaped-text (prin1-to-string text)))
+    (ess-eval-linewise (format "%s(%s)" r_fn escaped-text))))
+
+(defun text-around-cursor (&optional rows-around)
+  (let ((rows-around (or rows-around 10))
+  (current-line (line-number-at-pos))
+  (initial-point (point)))
+    (save-mark-and-excursion
+      (goto-line (- current-line rows-around))
+      (set-mark (point))
+      (goto-line (+ current-line rows-around))
+      (end-of-line)
+      ;; Return a list of text, index
+      (list (buffer-substring-no-properties (mark) (point))
+        (- initial-point (mark))))))
+
+(defun fnmate ()
+  (let* ((input-context (text-around-cursor))
+    (text (prin1-to-string (car input-context)))
+    (index (cdr input-context)))
+    (ess-eval-linewise (format "fnmate_fn.R(%s, %s)" text index))))
+
+(defun exec-r-fn-to-buffer (r_fn text)
+  (let ((escaped-text (prin1-to-string text))
+        (r-process (ess-get-process))
+        (r-output-buffer (get-buffer-create "*R-output*")))
+    (ess-command
+     (format "%s(%s)\n" f_fn escaped-text)
+     r-output-buffer nil nil nil r-process)
+    (save-mark-and-excursion
+      (goto-char (point-max))
+      (newline)
+      (insert-buffer r-output-buffer))
+    ))
+
+;; still needs fixing
+(defun fnmate-internal ()
+  (let* ((input-context (text-around-cursor))
+         (text (prin1-to-string (car input-context)))
+         (index (cdr input-context)))
+    (ess-eval-linewise (format "fnmate_fn.R(%s, %s)" text index))))
+  )
+        
+```

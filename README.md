@@ -1,3 +1,3 @@
-# fnyes
+# fnmate
 
 nothing much yet.

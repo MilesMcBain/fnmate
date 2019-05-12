@@ -1,0 +1,13 @@
+Package: fnmate
+Title: Create function definitions from function expressions
+Version: 0.0.0.9000
+Authors@R: person("Miles", "McBain", email = "miles.mcbain@gmail.com", role = c("aut", "cre"))
+Description: Convert any funcntion expression under the cursor to a definition contained in a file.
+Depends: R (>= 3.6.0)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
