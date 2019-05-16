@@ -9,8 +9,8 @@ fnmate_fn.R <- function(text, index) {
 
 }
 
-fnmate_local <- function(text, index) {
-  fn_defn_from_cursor(text, index, external = FALSE)$fn_text
+fnmate_internal <- function(text, index) {
+  fn_defn_from_cursor(text, index, external = FALSE)$fn_defn
 }
 
 fn_defn_from_cursor <- function(text, index, external = TRUE) {

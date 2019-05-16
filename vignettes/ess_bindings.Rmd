@@ -41,24 +41,23 @@ knitr::opts_chunk$set(
     (ess-eval-linewise (format "fnmate_fn.R(%s, %s)" text index))))
 
 (defun exec-r-fn-to-buffer (r_fn text)
-  (let ((escaped-text (prin1-to-string text))
-        (r-process (ess-get-process))
+  (let ((r-process (ess-get-process))
         (r-output-buffer (get-buffer-create "*R-output*")))
-    (ess-command
-     (format "%s(%s)\n" f_fn escaped-text)
-     r-output-buffer nil nil nil r-process)
+    (ess-string-command
+     (format "glue::glue(%s(%s))\n" r_fn text)
+     r-output-buffer nil)
     (save-mark-and-excursion
       (goto-char (point-max))
       (newline)
       (insert-buffer r-output-buffer))
     ))
 
-;; still needs fixing
 (defun fnmate-internal ()
   (let* ((input-context (text-around-cursor))
          (text (prin1-to-string (car input-context)))
-         (index (cdr input-context)))
-    (ess-eval-linewise (format "fnmate_fn.R(%s, %s)" text index))))
-  )
-        
+         (index (cdr input-context))
+         (args (format "%s, %s" text index)))
+    (exec-r-fn-to-buffer "fnmate_internal" args)))
 ```
+
+
