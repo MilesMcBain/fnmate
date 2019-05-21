@@ -17,9 +17,7 @@ knitr::opts_chunk$set(
 # Here is your lisp
 
 ```
-(defun exec-r-fn-with-text (r_fn text)
-  (let ((escaped-text (prin1-to-string text)))
-    (ess-eval-linewise (format "%s(%s)" r_fn escaped-text))))
+;; Helpers
 
 (defun text-around-cursor (&optional rows-around)
   (let ((rows-around (or rows-around 10))
@@ -34,23 +32,33 @@ knitr::opts_chunk$set(
       (list (buffer-substring-no-properties (mark) (point))
         (- initial-point (mark))))))
 
+(defun strip-ess-output-junk (r-buffer)
+  (with-current-buffer r-buffer
+    (goto-char (point-min))
+    (while (re-search-forward "\\+\s" nil t)
+      (replace-match "")))
+  )
+
+(defun exec-r-fn-to-buffer (r_fn text)
+  (let ((r-process (ess-get-process))
+        (r-output-buffer (get-buffer-create "*R-output*")))
+    (ess-string-command
+     (format "cat(%s(%s))\n" r_fn text)
+     r-output-buffer nil)
+    (strip-ess-output-junk r-output-buffer)
+    (save-mark-and-excursion
+      (goto-char (point-max))
+      (newline)
+      (insert-buffer r-output-buffer))
+    ))
+
+;; fnmate functions for keybindings 
 (defun fnmate ()
   (let* ((input-context (text-around-cursor))
     (text (prin1-to-string (car input-context)))
     (index (cdr input-context)))
     (ess-eval-linewise (format "fnmate_fn.R(%s, %s)" text index))))
 
-(defun exec-r-fn-to-buffer (r_fn text)
-  (let ((r-process (ess-get-process))
-        (r-output-buffer (get-buffer-create "*R-output*")))
-    (ess-string-command
-     (format "glue::glue(%s(%s))\n" r_fn text)
-     r-output-buffer nil)
-    (save-mark-and-excursion
-      (goto-char (point-max))
-      (newline)
-      (insert-buffer r-output-buffer))
-    ))
 
 (defun fnmate-internal ()
   (let* ((input-context (text-around-cursor))
@@ -58,6 +66,8 @@ knitr::opts_chunk$set(
          (index (cdr input-context))
          (args (format "%s, %s" text index)))
     (exec-r-fn-to-buffer "fnmate_internal" args)))
+
+
 ```
 
 
