@@ -132,7 +132,7 @@ locate_fn_target <- function(text, index) {
 
   matches <-
     gregexpr(function_open_pattern, text)[[1]] %>%
-    purrr::keep(~. < index)
+    purrr::keep(~. <= index)
 
   match_row_col <-
     purrr::map(matches, ~index_to_row_col(text, .x))
@@ -236,10 +236,14 @@ row_col_to_index <- function(text, row, col) {
 }
 
 span_contains <- function(span, index) {
-  span$line1 <= index$row &&
-    span$line2 >= index$row &&
-    span$col1 <= index$col &&
-    span$col2 >= index$col
+  within_line_span <-
+    span$line1 <= index$row &&
+    span$line2 >= index$row
+
+  if (span$line1 == index$row) within_row_span <- span$col1 <= index$col
+  else within_row_span <- span$col2 >= index$col
+
+  within_line_span && within_row_span
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x

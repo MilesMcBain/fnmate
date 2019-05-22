@@ -10,7 +10,8 @@ drake_plan(
                          arg3,
                          arg4,
                          really_bloody_long_arg,
-                         really_bloody_longer_arg)
+                         really_bloody_longer_arg),
+
   texty_one = fn3("text", "\"text in text\""),
 
   targ = a_thing(arg1, arg2),

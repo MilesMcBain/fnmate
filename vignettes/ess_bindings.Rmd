@@ -30,14 +30,13 @@ knitr::opts_chunk$set(
       (end-of-line)
       ;; Return a list of text, index
       (list (buffer-substring-no-properties (mark) (point))
-        (- initial-point (mark))))))
+            (+ (- initial-point (mark)) 1)))))
 
 (defun strip-ess-output-junk (r-buffer)
   (with-current-buffer r-buffer
     (goto-char (point-min))
     (while (re-search-forward "\\+\s" nil t)
-      (replace-match "")))
-  )
+      (replace-match ""))))
 
 (defun exec-r-fn-to-buffer (r_fn text)
   (let ((r-process (ess-get-process))
@@ -49,10 +48,9 @@ knitr::opts_chunk$set(
     (save-mark-and-excursion
       (goto-char (point-max))
       (newline)
-      (insert-buffer r-output-buffer))
-    ))
+      (insert-buffer r-output-buffer))))
 
-;; fnmate functions for keybindings 
+;; fnmate functions for keybindings
 (defun fnmate ()
   (let* ((input-context (text-around-cursor))
     (text (prin1-to-string (car input-context)))
@@ -67,7 +65,4 @@ knitr::opts_chunk$set(
          (args (format "%s, %s" text index)))
     (exec-r-fn-to-buffer "fnmate_internal" args)))
 
-
 ```
-
-
