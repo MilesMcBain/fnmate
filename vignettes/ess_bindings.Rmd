@@ -51,18 +51,20 @@ knitr::opts_chunk$set(
       (insert-buffer r-output-buffer))))
 
 ;; fnmate functions for keybindings
-(defun fnmate ()
-  (let* ((input-context (text-around-cursor))
-    (text (prin1-to-string (car input-context)))
-    (index (cdr input-context)))
-    (ess-eval-linewise (format "fnmate_fn.R(%s, %s)" text index))))
+ (defun fnmate ()
+   (interactive)
+   (let* ((input-context (text-around-cursor))
+          (text (prin1-to-string (car input-context)))
+          (index (cdr input-context)))
+     (ess-eval-linewise (format "fnmate::fnmate_fn.R(%s, %s)" text index))))
 
 
 (defun fnmate-internal ()
+  (interactive)
   (let* ((input-context (text-around-cursor))
          (text (prin1-to-string (car input-context)))
          (index (cdr input-context))
          (args (format "%s, %s" text index)))
-    (exec-r-fn-to-buffer "fnmate_internal" args)))
+    (exec-r-fn-to-buffer "fnmate::fnmate_internal" args)))
 
 ```

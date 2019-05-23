@@ -1,7 +1,27 @@
 globalVariables(".fnmate_env")
 .fnmate_env <- new.env()
 
-
+##' Create a definition in file for the function used at index.
+##'
+##' Given some text and an index into the text, this function creates a new file
+##' containing a definition for the function used at the index. The file name is
+##' the same as the function. An error is thrown if no function is found.
+##'
+##' By default the function is created in the './R' folder. This can be changed
+##' with the `fnmate_folder` option.
+##'
+##' By default the function body contains only NULL. This can be changed with
+##' the `fnmate_placeholder` option.
+##'
+##' This function is not intended to be used directly but by the fnmate front
+##' end - either Emacs or RStudio.
+##'
+##' @title fnmate_fn.R
+##' @param text some text from a source file
+##' @param index an index into text indicating the cursor position.
+##' @return Nothing, file created as side effect.
+##' @author Miles McBain
+##' @export
 fnmate_fn.R <- function(text, index) {
   fnmate_target <- fn_defn_from_cursor(text, index, external = TRUE)
   write_fn_file(fnmate_target$fn_name,
@@ -9,6 +29,27 @@ fnmate_fn.R <- function(text, index) {
 
 }
 
+##' Create a definition for the function used at index.
+##'
+##' Given some text and an index into the text, this function generates text
+##' containing a definition for the function used at the index. An error is
+##' thrown if no function is found.
+##'
+##' By default the function is created in the './R' folder. This can be changed
+##' with the `fnmate_folder` option.
+##'
+##' By default the function body contains only NULL. This can be changed with
+##' the `fnmate_placeholder` option.
+##'
+##' This function is not intended to be used directly but by the fnmate front
+##' end - either Emacs or RStudio.
+##'
+##' @title fnmate_internal
+##' @param text some text from a source file
+##' @param index an index into text indicating the cursor position.
+##' @return text containing function definition.
+##' @author Miles McBain
+##' @export
 fnmate_internal <- function(text, index) {
   fn_defn_from_cursor(text, index, external = FALSE)$fn_defn
 }
@@ -119,7 +160,7 @@ build_external_roxygen <- function(fn_arg_names) {
   tail <-
     glue::glue(
             "##' @return\n",
-            "##' @author {system(\"git config user.name\", intern = TRUE)}\n",
+            "##' @author {system2(\"git\", args = c(\"config\", \"user.name\"), stdout = TRUE)}\n",
             "##' @export")
 
   paste0(c(head, params, tail), collapse = "\n")
