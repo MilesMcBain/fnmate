@@ -105,7 +105,7 @@ write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder
       (.fnmate_env$previous_call %||% "") != fn_name) {
     .fnmate_env$previous_call = fn_name
     message(target_file, " already exists. Call fnmate again on this function to overwrite file.")
-    return(NULL)
+    return(invisible(NULL))
   }
 
   readr::write_file(x = fn_defn, path = target_file)
@@ -151,6 +151,7 @@ build_external_roxygen <- function(fn_arg_names) {
                   "##' .. content for \\description{{}} (no empty lines) ..\n",
                   "##'\n",
                   "##' .. content for \\details{{}} ..\n",
+                  "##'\n",
                   "##' @title")
 
   params <-
@@ -220,7 +221,7 @@ locate_fn_target <- function(text, index) {
     purrr::keep(~span_contains(.x, index_row_col)) %>%
     tail(1)
 
-  if (length(fn_target_location) == 0) stop("fnyes couldn't find a parsable function at cursor.")
+  if (length(fn_target_location) == 0) stop("fnmate couldn't find a parsable function at cursor.")
 
   fn_target_location <- fn_target_location[[1]]
 
