@@ -249,6 +249,7 @@ first_fn_expr <- function(parse_data) {
 
   if (!root_is_complete_function(parse_data)) return(NULL)
   first_function_parent_id <- parse_data[1,]
+  first_function_parent_id
 
 }
 
