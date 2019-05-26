@@ -282,10 +282,14 @@ span_contains <- function(span, index) {
     span$line1 <= index$row &&
     span$line2 >= index$row
 
-  if (span$line1 == index$row) within_row_span <- span$col1 <= index$col
-  else within_row_span <- span$col2 >= index$col
+  if ((span$line1 == span$line2) && (span$line1 == index$row)) {
+    within_col_span <- span$col1 <= index$col && span$col2 >= index$col
+  }
+  else if (span$line1 == index$row) within_col_span <- span$col1 <= index$col
+  else if (span$line2 == index$row) within_col_span <- span$col2 >= index$col
+  else within_col_span <- TRUE
 
-  within_line_span && within_row_span
+  within_line_span && within_col_span
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
