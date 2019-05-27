@@ -29,7 +29,7 @@ fnmate_fn.R <- function(text, index) {
 
 }
 
-##' Create a definition for the function used at index.
+##' Create a definition below for the function used at index.
 ##'
 ##' Given some text and an index into the text, this function generates text
 ##' containing a definition for the function used at the index. An error is
@@ -44,13 +44,13 @@ fnmate_fn.R <- function(text, index) {
 ##' This function is not intended to be used directly but by the fnmate front
 ##' end - either Emacs or RStudio.
 ##'
-##' @title fnmate_internal
+##' @title fnmate_below
 ##' @param text some text from a source file
 ##' @param index an index into text indicating the cursor position.
 ##' @return text containing function definition.
 ##' @author Miles McBain
 ##' @export
-fnmate_internal <- function(text, index) {
+fnmate_below <- function(text, index) {
   fn_defn_from_cursor(text, index, external = FALSE)$fn_defn
 }
 

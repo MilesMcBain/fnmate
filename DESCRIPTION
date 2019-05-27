@@ -17,4 +17,5 @@ Imports:
     magrittr,
     purrr,
     glue,
-    readr
+    readr,
+    rstudioapi

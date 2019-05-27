@@ -1,0 +1,9 @@
+Name: Create function definition file
+Description: Create an R file that contains a definition for the function call at the cursor position.
+Binding: rs_fnmate
+Interactive: false
+
+Name: Create function definition below
+Description: Create text that contains a definition for the function call at the cursor position.
+Binding: rs_fnmate_below
+Interactive: false
