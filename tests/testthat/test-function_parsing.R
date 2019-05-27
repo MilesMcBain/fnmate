@@ -65,5 +65,22 @@ expect_equal(locate_fn_target(test_text, 411),
 expect_equal(locate_fn_target(test_text, 103),
              "my.func2(foo = list(1,2,3), 4, target3)")
 
+neg_test_text <- "foo <- 1985
+bar <- foo^2 %>%
+  .*0.01 %>%
+  some_function(arg1,
+                arg2,
+                arg3,"
+## foo
+expect_error(locate_fn_target(neg_test_text, 20),
+             "fnmate couldn't find")
+
+## some_function
+expect_error(locate_fn_target(neg_test_text, 50),
+             "fnmate couldn't find")
+
+## arg2
+expect_error(locate_fn_target(neg_test_text, 82),
+             "fnmate couldn't find")
 
 })
