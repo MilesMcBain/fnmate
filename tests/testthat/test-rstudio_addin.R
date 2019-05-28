@@ -78,5 +78,5 @@ test_that("text around cursor for addin works", {
     class = "document_context")
 
   expect_equal(window_around_cursor(context_mock2)$text,
-               "c(\nfoo\n)")
+               "c(\nfoo\n)\n")
 })
