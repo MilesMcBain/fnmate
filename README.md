@@ -32,13 +32,13 @@ There is some Emacs lisp you can use to create bindings to `fnmate` contained in
 
 There are some options that affect how `fnmate` works:
 
-  * `fnmate_window` determines how many lines above and below the current cursor position `fn_mate` with look for a function call that encloses the cursor. Defaults to 20 which probably covers three standard deviations of coding styles.
+  * `fnmate_window` determines how many lines above and below the current cursor position `fnmate` will look for a function call that encloses the cursor. Defaults to 20 which probably covers three standard deviations of coding styles.
   * `fnmate_folder` is the name of the folder in the current working directory to place created definition files. Defaults to "R".
   * `fnmate_placeholder` is the placeholder value that gets put in the function body. Defaults to `NULL`, can be set to any text.
   
 # Why does this exist?
 
-A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go and fill in the blanks. This addin helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
+A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go bCK and fill in the blanks. This tool helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
 
 Recently when developing R workflow plans with [`drake`](https://github.com/ropensci/drake) I've found myself wanting a tool like this so that my sketch of the workflow plan can be built, even though some of the targets a just placeholders.
 
