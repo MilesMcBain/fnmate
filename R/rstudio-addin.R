@@ -54,7 +54,7 @@ rs_fnmate_below <- function(context = rstudioapi::getActiveDocumentContext()) {
   end_row <- length(context$contents)
 
   cursor_context <- window_around_cursor(context)
-  function_text <- fnmate_below(cursor_context$text, cursor_context$index)
+  function_text <- paste0("\n",fnmate_below(cursor_context$text, cursor_context$index))
 
   rstudioapi::insertText(location = rstudioapi::document_position(row = end_row +1,
                                                                   col = 1),
