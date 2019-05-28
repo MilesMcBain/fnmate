@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Here is your lisp
 
-```
+```{lisp, eval = FALSE}
 ;; Helpers
 
 (defun text-around-cursor (&optional rows-around)
