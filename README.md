@@ -1,6 +1,6 @@
 # Your fnmate
 
-Type a call to a function and have a definition for that function appear with a keystroke. Lay the planks with your `fnmate` but leave the hammering til later.
+Type a call to a function and have a definition for that function appear with a keystroke. Lay the planks with your `fnmate` but leave the hammering til after smoko.
 
 ![fnmate](inst/media/fnmate.gif)
 
