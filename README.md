@@ -38,7 +38,7 @@ There are some options that affect how `fnmate` works:
   
 # Why does this exist?
 
-A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go bCK and fill in the blanks. This tool helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
+A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go back and fill in the blanks. This tool helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
 
 Recently when developing R workflow plans with [`drake`](https://github.com/ropensci/drake) I've found myself wanting a tool like this so that my sketch of the workflow plan can be built, even though some of the targets a just placeholders.
 
