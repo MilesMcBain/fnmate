@@ -7,3 +7,8 @@ Name: Create function definition below
 Description: Create text that contains a definition for the function call at the cursor position.
 Binding: rs_fnmate_below
 Interactive: false
+
+Name: Create function definition on clipboard
+Description: Create text that contains a definition for the function call at the cursor position.
+Binding: rs_fnmate_clip
+Interactive: false

@@ -62,3 +62,28 @@ rs_fnmate_below <- function(context = rstudioapi::getActiveDocumentContext()) {
                          id = context$id)
 
 }
+
+##' Generate function definition and paste it to the clipboard
+##'
+##' @title rs_fnmate_clip
+##' @param context from the rstudioapi
+##' @return nothing.
+##' @author Miles McBain
+##' @export
+rs_fnmate_clip <- function(context = rstudioapi::getActiveDocumentContext()) {
+
+  if (identical(context$id, "#console")) {
+    message("fnmate does not work on console text.")
+    return(invisible(NULL))
+  }
+
+  cursor_context <- window_around_cursor(context)
+
+  fnmate_output <- fn_defn_from_cursor(cursor_context$text,
+                                       cursor_context$index,
+                                       external = TRUE)
+
+  message("fnmate wrote a function definition to clipboard.")
+
+  clipr::write_clip(fnmate_output$fn_defn, object_type = "character")
+}
