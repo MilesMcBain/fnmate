@@ -18,4 +18,5 @@ Imports:
     purrr,
     glue,
     readr,
-    rstudioapi
+    rstudioapi,
+    clipr
