@@ -1,6 +1,6 @@
 # Your fnmate
 
-Type a call to a function and have a definition for that function appear with a keystroke. Lay the planks with your `fnmate` but leave the hammering til later.
+Type a call to a function and have a definition for that function appear with a keystroke. Lay the planks with your `fnmate` but leave the hammering til after smoko.
 
 ![fnmate](inst/media/fnmate.gif)
 
@@ -38,8 +38,8 @@ There are some options that affect how `fnmate` works:
   
 # Why does this exist?
 
-A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go bCK and fill in the blanks. This tool helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
+A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go back and fill in the blanks. This tool helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
 
-Recently when developing R workflow plans with [`drake`](https://github.com/ropensci/drake) I've found myself wanting a tool like this so that my sketch of the workflow plan can be built, even though some of the targets a just placeholders.
+Recently when developing R workflow plans with [`drake`](https://github.com/ropensci/drake) I've found myself wanting a tool like this so that my sketch of the workflow plan can be built, even though some of the targets are just placeholders.
 
 Also realising this idea in a robust way turned out to be way more challenging than I anticipated and necessitated coopting the R parser and its `parseData` output. So it became a learning exercise.
