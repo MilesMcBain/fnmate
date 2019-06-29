@@ -1,3 +1,5 @@
+[![Travis build status](https://travis-ci.org/MilesMcBain/fnmate.svg?branch=master)](https://travis-ci.org/MilesMcBain/fnmate) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/MilesMcBain/fnmate?branch=master&svg=true)](https://ci.appveyor.com/project/MilesMcBain/fnmate)
+
 # Your fnmate
 
 Type a call to a function and have a definition for that function appear with a keystroke. Lay the planks with your `fnmate` but leave the hammering til after smoko.
