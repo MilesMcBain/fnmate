@@ -27,4 +27,5 @@ Imports:
     readr,
     rstudioapi,
     clipr,
-    utils
+    utils,
+    rlang
