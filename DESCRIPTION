@@ -19,4 +19,5 @@ Imports:
     glue,
     readr,
     rstudioapi,
-    clipr
+    clipr,
+    utils

@@ -219,7 +219,7 @@ locate_fn_target <- function(text, index) {
   fn_target_location <-
     fn_candidate_text_coords %>%
     purrr::keep(~span_contains(.x, index_row_col)) %>%
-    tail(1)
+    utils::tail(1)
 
   if (length(fn_target_location) == 0) stop("fnmate couldn't find a parsable function at cursor.")
 
@@ -242,7 +242,7 @@ parse_from_idx <- function(text, index) {
   parse_safely(text = target_text,
                keep.source = TRUE,
                srcfile = tstfile)
-  getParseData(tstfile)
+  utils::getParseData(tstfile)
 }
 
 first_fn_expr <- function(parse_data) {
