@@ -83,7 +83,11 @@ rs_fnmate_clip <- function(context = rstudioapi::getActiveDocumentContext()) {
                                        cursor_context$index,
                                        external = TRUE)
 
-  message("fnmate wrote a function definition to clipboard.")
+  message(
+    "fnmate wrote the definition for `",
+    fnmate_output$fn_name,
+    "()` to the clipboard."
+  )
 
   clipr::write_clip(fnmate_output$fn_defn, object_type = "character")
 }
