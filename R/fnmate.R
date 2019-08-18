@@ -23,6 +23,11 @@ globalVariables(".fnmate_env")
 ##' @author Miles McBain
 ##' @export
 fnmate_fn.R <- function(text, index) {
+
+  truncated_input <- truncate_to_chunk_boundary(text, index)
+  text <- truncated_input$text
+  index <- truncated_input$index
+  assert_length_1(text)
   fnmate_target <- fn_defn_from_cursor(text, index, external = TRUE)
   write_fn_file(fnmate_target$fn_name,
                 fnmate_target$fn_defn)
@@ -51,7 +56,13 @@ fnmate_fn.R <- function(text, index) {
 ##' @author Miles McBain
 ##' @export
 fnmate_below <- function(text, index) {
+
+  truncated_input <- truncate_to_chunk_boundary(text, index)
+  text <- truncated_input$text
+  index <- truncated_input$index
+  assert_length_1(text)
   fn_defn_from_cursor(text, index, external = FALSE)$fn_defn
+
 }
 
 fn_defn_from_cursor <- function(text, index, external = TRUE) {
@@ -176,6 +187,8 @@ locate_fn_target <- function(text, index) {
     gregexpr(function_open_pattern, text)[[1]] %>%
     purrr::keep(~. <= index)
 
+  if (identical(matches, -1)) stop("fnmate couldn't find a parsable function at cursor.")
+
   match_row_col <-
     purrr::map(matches, ~index_to_row_col(text, .x))
 
@@ -294,3 +307,38 @@ span_contains <- function(span, index) {
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
+
+truncate_to_chunk_boundary <- function(text, index) {
+
+  tripple_ticks <- gregexpr("```", text, perl = TRUE)[[1]]
+
+  upper_fence <- tripple_ticks[head(which(tripple_ticks > index), 1)]
+  lower_fence <- tripple_ticks[tail(which(tripple_ticks < index), 1)]
+
+  if (length(upper_fence) == 0) {
+    upper_fence <- nchar(text)
+  } else {
+    upper_fence <- upper_fence - 1
+  }
+
+  if (length(lower_fence) == 0) {
+    lower_fence <-  1
+  } else {
+    lower_fence <- lower_fence + 3
+  }
+
+  list(
+    index = index - (lower_fence - 1),
+    text = substring(text,
+                     first = lower_fence,
+                     last = upper_fence)
+  )
+
+}
+
+assert_length_1 <- function(text) {
+
+  if(length(text) !=  1)
+    stop("text is expected to be a length 1 character vector. Its length was: ", length(text))
+
+}
