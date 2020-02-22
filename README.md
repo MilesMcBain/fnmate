@@ -19,9 +19,10 @@ remotes::install_github("milesmcbain/fnmate")
 There are two addins that do pretty much what their names suggest:
 
   * `Create function definition file`
+  * `Create functoin definition on clipboard`
   * `Create function definition below`
     - as in appended to the end of the current file. Roxygen is not added in this case.
- 
+  
 You can bind these to key combinations of your choosing, see [here](https://rstudio.github.io/rstudioaddins/#keyboard-shorcuts). 
   
 The function to be generated is determined by the cursor position.  The function call at the most nested scope that encloses the cursor is the one that `fnmate` will generate a definition for.
