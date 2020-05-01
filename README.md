@@ -16,10 +16,10 @@ remotes::install_github("milesmcbain/fnmate")
 
 ## RStudio
 
-There are two addins that do pretty much what their names suggest:
+There are three addins that do pretty much what their names suggest:
 
   * `Create function definition file`
-  * `Create functoin definition on clipboard`
+  * `Create function definition on clipboard`
   * `Create function definition below`
     - as in appended to the end of the current file. Roxygen is not added in this case.
   
