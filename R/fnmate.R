@@ -23,13 +23,18 @@ globalVariables(".fnmate_env")
 ##' @author Miles McBain
 ##' @export
 fnmate_fn.R <- function(text, index) {
+
+  truncated_input <- truncate_to_chunk_boundary(text, index)
+  text <- truncated_input$text
+  index <- truncated_input$index
+  assert_length_1(text)
   fnmate_target <- fn_defn_from_cursor(text, index, external = TRUE)
   write_fn_file(fnmate_target$fn_name,
                 fnmate_target$fn_defn)
 
 }
 
-##' Create a definition for the function used at index.
+##' Create a definition below for the function used at index.
 ##'
 ##' Given some text and an index into the text, this function generates text
 ##' containing a definition for the function used at the index. An error is
@@ -44,14 +49,20 @@ fnmate_fn.R <- function(text, index) {
 ##' This function is not intended to be used directly but by the fnmate front
 ##' end - either Emacs or RStudio.
 ##'
-##' @title fnmate_internal
+##' @title fnmate_below
 ##' @param text some text from a source file
 ##' @param index an index into text indicating the cursor position.
 ##' @return text containing function definition.
 ##' @author Miles McBain
 ##' @export
-fnmate_internal <- function(text, index) {
+fnmate_below <- function(text, index) {
+
+  truncated_input <- truncate_to_chunk_boundary(text, index)
+  text <- truncated_input$text
+  index <- truncated_input$index
+  assert_length_1(text)
   fn_defn_from_cursor(text, index, external = FALSE)$fn_defn
+
 }
 
 fn_defn_from_cursor <- function(text, index, external = TRUE) {
@@ -105,7 +116,7 @@ write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder
       (.fnmate_env$previous_call %||% "") != fn_name) {
     .fnmate_env$previous_call = fn_name
     message(target_file, " already exists. Call fnmate again on this function to overwrite file.")
-    return(NULL)
+    return(invisible(NULL))
   }
 
   readr::write_file(x = fn_defn, path = target_file)
@@ -151,6 +162,7 @@ build_external_roxygen <- function(fn_arg_names) {
                   "##' .. content for \\description{{}} (no empty lines) ..\n",
                   "##'\n",
                   "##' .. content for \\details{{}} ..\n",
+                  "##'\n",
                   "##' @title")
 
   params <-
@@ -174,6 +186,8 @@ locate_fn_target <- function(text, index) {
   matches <-
     gregexpr(function_open_pattern, text)[[1]] %>%
     purrr::keep(~. <= index)
+
+  if (identical(matches, -1)) stop("fnmate couldn't find a parsable function at cursor.")
 
   match_row_col <-
     purrr::map(matches, ~index_to_row_col(text, .x))
@@ -218,9 +232,9 @@ locate_fn_target <- function(text, index) {
   fn_target_location <-
     fn_candidate_text_coords %>%
     purrr::keep(~span_contains(.x, index_row_col)) %>%
-    tail(1)
+    utils::tail(1)
 
-  if (length(fn_target_location) == 0) stop("fnyes couldn't find a parsable function at cursor.")
+  if (length(fn_target_location) == 0) stop("fnmate couldn't find a parsable function at cursor.")
 
   fn_target_location <- fn_target_location[[1]]
 
@@ -241,13 +255,14 @@ parse_from_idx <- function(text, index) {
   parse_safely(text = target_text,
                keep.source = TRUE,
                srcfile = tstfile)
-  getParseData(tstfile)
+  utils::getParseData(tstfile)
 }
 
 first_fn_expr <- function(parse_data) {
 
   if (!root_is_complete_function(parse_data)) return(NULL)
   first_function_parent_id <- parse_data[1,]
+  first_function_parent_id
 
 }
 
@@ -302,3 +317,38 @@ deparse_one_string <- function(code) {
   char_vec_clean <- gsub("^\\s+", "\\s", char_vec)
   paste0(char_vec_clean, collapse = "")
 } 
+
+truncate_to_chunk_boundary <- function(text, index) {
+
+  tripple_ticks <- gregexpr("```", text, perl = TRUE)[[1]]
+
+  upper_fence <- tripple_ticks[head(which(tripple_ticks > index), 1)]
+  lower_fence <- tripple_ticks[tail(which(tripple_ticks < index), 1)]
+
+  if (length(upper_fence) == 0) {
+    upper_fence <- nchar(text)
+  } else {
+    upper_fence <- upper_fence - 1
+  }
+
+  if (length(lower_fence) == 0) {
+    lower_fence <-  1
+  } else {
+    lower_fence <- lower_fence + 3
+  }
+
+  list(
+    index = index - (lower_fence - 1),
+    text = substring(text,
+                     first = lower_fence,
+                     last = upper_fence)
+  )
+
+}
+
+assert_length_1 <- function(text) {
+
+  if(length(text) !=  1)
+    stop("text is expected to be a length 1 character vector. Its length was: ", length(text))
+
+}
