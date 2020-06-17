@@ -75,7 +75,7 @@ fn_defn_from_cursor <- function(text, index, external = TRUE) {
                          name_is_arg = name_is_arg),
                     function(name, arg, name_is_arg) {
 
-                      if (!name_is_arg) paste0(name, " = ", deparse(arg))
+                      if (!name_is_arg) paste0(name, " = ", deparse_one_string(arg))
                       else name
 
                     })
@@ -281,10 +281,24 @@ span_contains <- function(span, index) {
     span$line1 <= index$row &&
     span$line2 >= index$row
 
-  if (span$line1 == index$row) within_row_span <- span$col1 <= index$col
-  else within_row_span <- span$col2 >= index$col
+  single_line_span <- span$line1 == span$line2
+  on_first_line <- index$row == span$line1
+  on_last_line <- index$row == span$line2
 
-  within_line_span && within_row_span
+  if(single_line_span) within_col_span <- index$col >= span$col1 && index$col <= span$col2  
+  else if (on_first_line) within_col_span <- index$col >= span$col1
+  else if (on_last_line) within_col_span <- index$col <= span$col2
+  else within_col_span <- within_line_span
+
+  within_line_span && within_col_span
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
+
+## annoyingly one can't stop deparse from auto wrapping expressions, one can only set the limit very high.
+## In case an expression is wrapped, put it back on one line.
+deparse_one_string <- function(code) {
+  char_vec <- deparse(code, width.cutoff = 500)
+  char_vec_clean <- gsub("^\\s+", "\\s", char_vec)
+  paste0(char_vec_clean, collapse = "")
+} 
