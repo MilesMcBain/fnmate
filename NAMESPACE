@@ -3,6 +3,7 @@
 export("%>%")
 export(fnmate_below)
 export(fnmate_fn.R)
+export(rs_fn_defn_jump)
 export(rs_fnmate)
 export(rs_fnmate_below)
 export(rs_fnmate_clip)

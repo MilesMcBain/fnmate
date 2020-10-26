@@ -1,6 +1,6 @@
 Package: fnmate
 Title: Create function definitions from function expressions
-Version: 0.0.1
+Version: 0.0.1.9000
 Authors@R: c(person(given = "Miles",
                     family = "McBain",
                     email = "miles.mcbain@gmail.com",
@@ -19,7 +19,7 @@ Suggests:
     rmarkdown,
     testthat (>= 2.1.0)
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Imports: 
     magrittr,
     purrr,

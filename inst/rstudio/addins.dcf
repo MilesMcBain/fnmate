@@ -12,3 +12,8 @@ Name: Create function definition on clipboard
 Description: Create text that contains a definition for the function call at the cursor position.
 Binding: rs_fnmate_clip
 Interactive: false
+
+Name: Jump to function definition
+Description: Reveal the local definition for the function the cursor is on
+Binding: rs_fn_defn_jump
+Interactive: false
