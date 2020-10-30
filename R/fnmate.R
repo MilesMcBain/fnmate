@@ -119,7 +119,7 @@ write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder
     return(invisible(NULL))
   }
 
-  readr::write_file(x = fn_defn, path = target_file)
+  readr::write_file(x = fn_defn, file = target_file)
   message("fnmate Wrote ", target_file)
   .fnmate_env$previous_call <- NULL
 
@@ -267,7 +267,8 @@ first_fn_expr <- function(parse_data) {
 }
 
 root_is_complete_function <- function(parse_data) {
-  parse_data[grepl("SYMBOL", parse_data$token),]$token[[1]] == "SYMBOL_FUNCTION_CALL"
+  symbols <- grepl("SYMBOL", parse_data$token)
+  any(symbols) && parse_data[symbols, ]$token[[1]] == "SYMBOL_FUNCTION_CALL"
 }
 
 index_to_row_col <- function(text, index) {
