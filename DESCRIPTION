@@ -24,7 +24,7 @@ Imports:
     magrittr,
     purrr,
     glue,
-    readr,
+    readr (>= 1.4.0),
     rstudioapi,
     clipr,
     utils,
