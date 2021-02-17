@@ -8,7 +8,10 @@ Authors@R: c(person(given = "Miles",
              person(given = "Kirill",
                     family = "Müller",
                     role = "ctb",
-                    email = "krlmlr+r@mailbox.org"))
+                    email = "krlmlr+r@mailbox.org"),
+             person(given = "Andrew",
+                    family = "Craig",
+                    role = "ctb"))
 Description: Convert any funcntion expression under the cursor to a definition contained in a file.
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE

@@ -27,9 +27,38 @@ You can bind these to key combinations of your choosing, see [here](https://rstu
   
 The function to be generated is determined by the cursor position.  The function call at the most nested scope that encloses the cursor is the one that `fnmate` will generate a definition for.
 
+There's another helper addin:
+
+  * `Jump to function definition` which gives you a project-wide function definition jump (repository-wide). This is convenient in RStudio and VSCode where jumping to definitions in newly created files that haven't been opened is either not possible (VSCode) or prone to failure (RStudio). This addin depends on some third party software. The default (and best) option looks for `rg` on the PATH for ultra-fast definition grepping - install from [ripgrep repo](https://github.com/BurntSushi/ripgrep). 
+    - Alternately configure the addin to use `git grep` (built into `git`) by setting the option `fnmate_searcher = "git_grep"`
+
+
 ## Emacs (ESS)
 
 There is some Emacs lisp you can use to create bindings to `fnmate` contained in the vignette *Using fnmate with ESS*. If you have better ideas about how to distribute ESS 'addins' please let me know!
+
+## VSCode
+
+The RStudio addin is supported in VSCode via `{rstudioapi}` emulation (needs to be turned on with option).
+
+With emulation turned on, configure a keybinding like:
+
+```json
+    {
+        "description": "create function defintion",
+        "key": "ctrl+;",
+        "command": "r.runCommand",
+        "when": "editorTextFocus",
+        "args": "fnmate::rs_fnmate()"
+    },
+    {
+        "description": "jump to function defintion",
+        "key": "ctrl+shift+;",
+        "command": "r.runCommand",
+        "when": "editorTextFocus",
+        "args": "fnmate::rs_fn_defn_jump()"
+    }
+```
 
 ## Options
 
@@ -38,6 +67,7 @@ There are some options that affect how `fnmate` works:
   * `fnmate_window` determines how many lines above and below the current cursor position `fnmate` will look for a function call that encloses the cursor. Defaults to 20 which probably covers three standard deviations of coding styles.
   * `fnmate_folder` is the name of the folder in the current working directory to place created definition files. Defaults to "R".
   * `fnmate_placeholder` is the placeholder value that gets put in the function body. Defaults to `NULL`, can be set to any text.
+  * `fmate_searcher` is the grep tool to use for the function definition jumping helper. Valid options are `"rg"` (ripgrep), and `"git_grep"`.
   
 # Why does this exist?
 
