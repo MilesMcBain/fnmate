@@ -83,4 +83,33 @@ expect_error(locate_fn_target(neg_test_text, 50),
 expect_error(locate_fn_target(neg_test_text, 82),
              "fnmate couldn't find")
 
+## function parsing in pipes
+
+test_chain <-
+  "rdeck(
+    initial_bounds = st_bbox(impacted_area_shape),
+    picking_radius = 2
+  ) %>%
+    add_area_of_interest_layer(impacted_area_shape) %>%
+    add_isochrone_layer(data_isochrones) %>%
+    # add_brigades_layer(brigades) %>%
+    add_stations_layer(slocation)"
+
+expect_equal(
+  locate_fn_target(test_chain, 15),
+  "rdeck(
+    initial_bounds = st_bbox(impacted_area_shape),
+    picking_radius = 2
+  )"
+)
+
+expect_equal(
+  locate_fn_target(test_chain, 160),
+  "add_isochrone_layer(data_isochrones)"
+)
+
+expect_equal(
+  locate_fn_target(test_chain, 250),
+  "add_stations_layer(slocation)"
+)
 })

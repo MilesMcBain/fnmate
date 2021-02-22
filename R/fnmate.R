@@ -261,14 +261,28 @@ parse_from_idx <- function(text, index) {
 first_fn_expr <- function(parse_data) {
 
   if (!root_is_complete_function(parse_data)) return(NULL)
-  first_function_parent_id <- parse_data[1,]
-  first_function_parent_id
+  first_function_parent_expression <- first_function_parent(parse_data)
+  first_function_parent_expression
 
 }
 
 root_is_complete_function <- function(parse_data) {
-  symbols <- grepl("SYMBOL", parse_data$token)
-  any(symbols) && parse_data[symbols, ]$token[[1]] == "SYMBOL_FUNCTION_CALL"
+  parse_data_not_expr <- parse_data[parse_data$token != "expr", ]
+  parse_data_not_expr$token[[1]] == "SYMBOL_FUNCTION_CALL"
+}
+
+first_function_parent <- function(parse_data) {
+  symbol_parent_id <-
+    parse_data[parse_data$token == "SYMBOL_FUNCTION_CALL",]$parent[[1]]
+
+  expression_parent_id <- 
+    parse_data[parse_data$id == symbol_parent_id, ]$parent[[1]]
+
+  ## The expr we want is actually the grandparent. The parent is an expr for
+  ## the function name symbol. The grandparent is the full multi-line/arg
+  ## expression.
+  parent_id <-
+    parse_data[parse_data$id == expression_parent_id, ]
 }
 
 index_to_row_col <- function(text, index) {
