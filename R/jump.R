@@ -23,7 +23,7 @@ get_search_fn <- function() {
 }
 
 ripgrep <- function(fn_name) {
-    search_regex <- glue::glue("\\b{fn_name}\\s*(?:<-|=)\\s*")
+    search_regex <- glue::glue("'\\b{fn_name}\\s*(?:<-|=)\\s*'")
     other_args <- c("-m1", "--vimgrep")
     result <- system2("rg", args = c(other_args, search_regex), stdout = TRUE)
 
