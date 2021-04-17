@@ -166,7 +166,7 @@ build_external_roxygen <- function(fn_arg_names) {
                   "#' @title")
 
   params <-
-    purrr::map_chr(fn_arg_names, ~glue::glue("##' @param {.x}")) %>%
+    purrr::map_chr(fn_arg_names, ~glue::glue("#' @param {.x}")) %>%
     paste0(collapse="\n")
 
   tail <-
