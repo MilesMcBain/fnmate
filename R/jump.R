@@ -23,7 +23,9 @@ get_search_fn <- function() {
 }
 
 ripgrep <- function(fn_name) {
-    search_regex <- glue::glue("\\b{fn_name}\\s*(?:<-|=)\\s*")
+    search_regex <- fnmate_quote_regex(
+        glue::glue("\\b{fn_name}\\s*(?:<-|=)\\s*")
+    )
     other_args <- c("-m1", "--vimgrep")
     result <- system2("rg", args = c(other_args, search_regex), stdout = TRUE)
 
@@ -41,7 +43,9 @@ ripgrep <- function(fn_name) {
 }
 
 git_grep <- function(fn_name) {
-    search_regex <- glue::glue("\'\\b{fn_name}\\s*(<-|=)\\s*\'")
+    search_regex <- fnmate_quote_regex(
+        glue::glue("\'\\b{fn_name}\\s*(<-|=)\\s*\'")
+    )
     other_args <- c("grep", "-nE", search_regex, "--", "\\*.R")
     result <- system2("git", args = other_args, stdout = TRUE)
 
@@ -56,4 +60,15 @@ git_grep <- function(fn_name) {
         row = result_components[[2]],
         col = 1
     )
+}
+
+# Powershell seems not to like quoting the regex, while  
+# As seen in issue #13 MacOS  seems to need it.
+# Linux seems not to care.
+fnmate_quote_regex <- function(regex) {
+    if (getOption("fnmate_quote_jump_regex") %||% FALSE) {
+       glue::glue("'{regex}'") 
+    } else {
+       regex 
+    }
 }
