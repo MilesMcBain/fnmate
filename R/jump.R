@@ -44,7 +44,7 @@ ripgrep <- function(fn_name) {
 
 git_grep <- function(fn_name) {
     search_regex <- fnmate_quote_regex(
-        glue::glue("\'\\b{fn_name}\\s*(<-|=)\\s*\'")
+        glue::glue("\\b{fn_name}\\s*(<-|=)\\s*")
     )
     other_args <- c("grep", "-nE", search_regex, "--", "\\*.R")
     result <- system2("git", args = other_args, stdout = TRUE)
