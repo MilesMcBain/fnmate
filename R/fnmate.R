@@ -159,21 +159,21 @@ build_internal_roxygen <- function() {
 build_external_roxygen <- function(fn_arg_names) {
 
   head <- glue::glue(
-                  "##' .. content for \\description{{}} (no empty lines) ..\n",
-                  "##'\n",
-                  "##' .. content for \\details{{}} ..\n",
-                  "##'\n",
-                  "##' @title")
+                  "#' .. content for \\description{{}} (no empty lines) ..\n",
+                  "#'\n",
+                  "#' .. content for \\details{{}} ..\n",
+                  "#'\n",
+                  "#' @title")
 
   params <-
-    purrr::map_chr(fn_arg_names, ~glue::glue("##' @param {.x}")) %>%
+    purrr::map_chr(fn_arg_names, ~glue::glue("#' @param {.x}")) %>%
     paste0(collapse="\n")
 
   tail <-
     glue::glue(
-            "##' @return\n",
-            "##' @author {system2(\"git\", args = c(\"config\", \"user.name\"), stdout = TRUE)}\n",
-            "##' @export")
+            "#' @return\n",
+            "#' @author {system2(\"git\", args = c(\"config\", \"user.name\"), stdout = TRUE)}\n",
+            "#' @export")
 
   paste0(c(head, params, tail), collapse = "\n")
 
@@ -337,8 +337,8 @@ truncate_to_chunk_boundary <- function(text, index) {
 
   tripple_ticks <- gregexpr("```", text, perl = TRUE)[[1]]
 
-  upper_fence <- tripple_ticks[head(which(tripple_ticks > index), 1)]
-  lower_fence <- tripple_ticks[tail(which(tripple_ticks < index), 1)]
+  upper_fence <- tripple_ticks[utils::head(which(tripple_ticks > index), 1)]
+  lower_fence <- tripple_ticks[utils::tail(which(tripple_ticks < index), 1)]
 
   if (length(upper_fence) == 0) {
     upper_fence <- nchar(text)

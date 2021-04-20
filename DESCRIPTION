@@ -11,6 +11,10 @@ Authors@R: c(person(given = "Miles",
                     email = "krlmlr+r@mailbox.org"),
              person(given = "Andrew",
                     family = "Craig",
+                    role = "ctb"),
+             person(given = "Shir", 
+                    family = "Dekel", 
+                    email = "shirdekel@yahoo.com.au", 
                     role = "ctb"))
 Description: Convert any funcntion expression under the cursor to a definition contained in a file.
 Depends: R (>= 3.5.0)
