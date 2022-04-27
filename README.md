@@ -68,7 +68,9 @@ There are some options that affect how `fnmate` works:
   * `fnmate_folder` is the name of the folder in the current working directory to place created definition files. Defaults to "R".
   * `fnmate_placeholder` is the placeholder value that gets put in the function body. Defaults to `NULL`, can be set to any text.
   * `fmate_searcher` is the grep tool to use for the function definition jumping helper. Valid options are `"rg"` (ripgrep), and `"git_grep"`.
-  * `fnmate_quote_jump_regex` can be set to `TRUE` if `Jump to function definiton` is not working due to an error in the command. This seems necessary on MacOS.
+  * `fnmate_quote_jump_regex` can be set to `TRUE` if `Jump to function definiton` is not working due to an error in the command. This seems necessary on MacOS and Linux.
+  
+You can modify any of these options by running, for example, `options(fnmate_quote_jump_regex = TRUE)` in your R session. 
   
 # Why does this exist?
 
