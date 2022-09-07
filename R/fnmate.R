@@ -172,7 +172,7 @@ build_external_roxygen <- function(fn_arg_names) {
   tail <-
     glue::glue(
             "#' @return\n",
-            "#' @author {system2(\"git\", args = c(\"config\", \"user.name\"), stdout = TRUE)}\n",
+            "#' @author {get_git_user_name()}\n",
             "#' @export")
 
   paste0(c(head, params, tail), collapse = "\n")

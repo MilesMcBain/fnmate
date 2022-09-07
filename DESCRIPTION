@@ -1,6 +1,6 @@
 Package: fnmate
 Title: Create function definitions from function expressions
-Version: 0.0.5
+Version: 0.0.6
 Authors@R: c(person(given = "Miles",
                     family = "McBain",
                     email = "miles.mcbain@gmail.com",
@@ -35,4 +35,5 @@ Imports:
     rstudioapi,
     clipr,
     utils,
-    rlang
+    rlang,
+    gert
