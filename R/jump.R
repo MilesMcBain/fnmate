@@ -46,7 +46,8 @@ git_grep <- function(fn_name) {
     search_regex <- fnmate_quote_regex(
         glue::glue("\\b{fn_name}\\s*(<-|=)\\s*")
     )
-    other_args <- c("grep", "-nE", search_regex, "--", "\\*.R")
+    search_pathspec <- fnmate_quote_regex("*.R")
+    other_args <- c("grep", "-nE", "--untracked", search_regex, "--", search_pathspec)
     result <- system2("git", args = other_args, stdout = TRUE)
 
     if (length(result) < 1) {
