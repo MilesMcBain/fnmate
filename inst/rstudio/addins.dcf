@@ -17,3 +17,8 @@ Name: Jump to function definition
 Description: Reveal the local definition for the function the cursor is on
 Binding: rs_fn_defn_jump
 Interactive: false
+
+Name: Run debugonce at cursor
+Description: Run debugonce at the target identified by the symbol at the cursor.
+Binding: rstudio_addin_debugonce
+Interactive: false
