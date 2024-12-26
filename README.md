@@ -22,14 +22,14 @@ There are three addins that do pretty much what their names suggest:
   * `Create function definition on clipboard`
   * `Create function definition below`
     - as in appended to the end of the current file. Roxygen is not added in this case.
-  
-You can bind these to key combinations of your choosing, see [here](https://rstudio.github.io/rstudioaddins/#keyboard-shorcuts). 
-  
+
+You can bind these to key combinations of your choosing, see [here](https://docs.posit.co/ide/user/ide/guide/productivity/add-ins.html#keyboard-shortcuts)
+
 The function to be generated is determined by the cursor position.  The function call at the most nested scope that encloses the cursor is the one that `fnmate` will generate a definition for.
 
 There's another helper addin:
 
-  * `Jump to function definition` which gives you a project-wide function definition jump (repository-wide). This is convenient in RStudio and VSCode where jumping to definitions in newly created files that haven't been opened is either not possible (VSCode) or prone to failure (RStudio). This addin depends on some third party software. The default (and best) option looks for `rg` on the PATH for ultra-fast definition grepping - install from [ripgrep repo](https://github.com/BurntSushi/ripgrep). 
+  * `Jump to function definition` which gives you a project-wide function definition jump (repository-wide). This is convenient in RStudio and VSCode where jumping to definitions in newly created files that haven't been opened is either not possible (VSCode) or prone to failure (RStudio). This addin depends on some third party software. The default (and best) option looks for `rg` on the PATH for ultra-fast definition grepping - install from [ripgrep repo](https://github.com/BurntSushi/ripgrep).
     - Alternately configure the addin to use `git grep` (built into `git`) by setting the option `fnmate_searcher = "git_grep"`
 
 
@@ -69,9 +69,9 @@ There are some options that affect how `fnmate` works:
   * `fnmate_placeholder` is the placeholder value that gets put in the function body. Defaults to `NULL`, can be set to any text.
   * `fmate_searcher` is the grep tool to use for the function definition jumping helper. Valid options are `"rg"` (ripgrep), and `"git_grep"`.
   * `fnmate_quote_jump_regex` can be set to `TRUE` if `Jump to function definiton` is not working due to an error in the command. This seems necessary on MacOS and Linux, depending on the shell version.
-  
-You can modify any of these options by running, for example, `options(fnmate_quote_jump_regex = TRUE)` in your R session or in your `.Rprofile`. 
-  
+
+You can modify any of these options by running, for example, `options(fnmate_quote_jump_regex = TRUE)` in your R session or in your `.Rprofile`.
+
 # Why does this exist?
 
 A lot of the time when I attack a problem I find it helps to cruise over the gnarly bits requiring fiddly code by just claiming a function exits that will magically resolve that fiddly bit for me. After I have a high level solution described, I go back and fill in the blanks. This tool helps me clearly mark out the blanks without breaking my flow on the higher level algorithm.
