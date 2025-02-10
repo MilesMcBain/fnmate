@@ -1,6 +1,6 @@
 Package: fnmate
 Title: Create function definitions from function expressions
-Version: 0.0.6
+Version: 0.0.7
 Authors@R: c(person(given = "Miles",
                     family = "McBain",
                     email = "miles.mcbain@gmail.com",
@@ -15,6 +15,10 @@ Authors@R: c(person(given = "Miles",
              person(given = "Shir", 
                     family = "Dekel", 
                     email = "shirdekel@yahoo.com.au", 
+                    role = "ctb"),
+             person(given = "Dan", 
+                    family = "Wilson", 
+                    email = "dan+r@birdmail.pro", 
                     role = "ctb"))
 Description: Convert any funcntion expression under the cursor to a definition contained in a file.
 Depends: R (>= 3.5.0)
@@ -36,4 +40,5 @@ Imports:
     clipr,
     utils,
     rlang,
-    gert
+    gert,
+    cli
