@@ -7,7 +7,7 @@ window_around_cursor <- function(context) {
   start_line <- max(cursor_line - window_size, 1)
   end_line <- min(cursor_line + window_size, length(context$contents))
   text_window <-
-    context$contents[seq(start_line, end_line)] %>%
+    context$contents[seq(start_line, end_line)] |>
     paste0(collapse = "\n")
 
   cursor_line <- cursor_line - start_line + 1
@@ -25,7 +25,10 @@ window_around_cursor <- function(context) {
 #' @export
 rs_fnmate <- function(context = rstudioapi::getActiveDocumentContext()) {
   if (identical(context$id, "#console")) {
-    message("fnmate does not work on console text.")
+    message(cli::format_message(c(
+      " " = "",
+      "i" = "fnmate does not work on console text."
+    )))
     return(invisible(NULL))
   }
 
@@ -43,7 +46,10 @@ rs_fnmate <- function(context = rstudioapi::getActiveDocumentContext()) {
 #' @export
 rs_fnmate_below <- function(context = rstudioapi::getActiveDocumentContext()) {
   if (identical(context$id, "#console")) {
-    message("fnmate does not work on console text.")
+    message(cli::format_message(c(
+      " " = "",
+      "i" = "fnmate does not work on console text."
+    )))
     return(invisible(NULL))
   }
 
@@ -71,7 +77,10 @@ rs_fnmate_below <- function(context = rstudioapi::getActiveDocumentContext()) {
 ##' @export
 rs_fnmate_clip <- function(context = rstudioapi::getActiveDocumentContext()) {
   if (identical(context$id, "#console")) {
-    message("fnmate does not work on console text.")
+    message(cli::format_message(c(
+      " " = "",
+      "i" = "fnmate does not work on console text."
+    )))
     return(invisible(NULL))
   }
 
@@ -82,10 +91,9 @@ rs_fnmate_clip <- function(context = rstudioapi::getActiveDocumentContext()) {
     external = TRUE
   )
 
-  message(
-    "fnmate wrote the definition for `",
-    fnmate_output$fn_name,
-    "()` to the clipboard."
+  message(cli::format_message(c(
+    " " = "",
+    "v" = "fnmate wrote the definition for {.fn fnmate_output$fn_name} to the clipboard."))
   )
 
   clipr::write_clip(fnmate_output$fn_defn, object_type = "character")

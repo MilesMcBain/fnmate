@@ -30,11 +30,21 @@ ripgrep <- function(fn_name) {
   result <- system2("rg", args = c(other_args, search_regex), stdout = TRUE)
 
   if (length(result) < 1) {
+    message(cli::format_message(c(
+      " " = "",
+      "x" = "No function called {.fn {fn_name}} was found."
+    )))
     return(list())
   }
 
   if (length(result) == 1) {
     result_components <- strsplit(result, ":")[[1]]
+
+    message(cli::format_message(c(
+      " " = "",
+      "v" = "Found {.fn {fn_name}} in {.pkg {result_components[[1]]}}",
+      "v" = "Opening {cli::col_green(result_components[[1]])}"
+    )))
 
     return(list(
       file = result_components[[1]],
@@ -55,7 +65,7 @@ ripgrep <- function(fn_name) {
 
   warning(cli::format_warning(c(
     " " = "",
-    "!" =  "There were {length(result)} files with the function {.code {fn_name}} identified to return",
+    "!" =  "There were {length(result)} files with the function {.fn {fn_name}} identified to return",
     "!" = "The files identified are {.pkg {all_files}}",
     "v" = "Opening {cli::col_green(selected_components[[1]])}"
   )))
@@ -76,11 +86,21 @@ git_grep <- function(fn_name) {
   result <- system2("git", args = other_args, stdout = TRUE)
 
   if (length(result) < 1) {
+    message(cli::format_message(c(
+      " " = "",
+      "x" = "No function called {.fn {fn_name}} was found."
+    )))
     return(list())
   }
 
   if (length(result) == 1) {
     result_components <- strsplit(result, ":")[[1]]
+
+    message(cli::format_message(c(
+      " " = "",
+      "v" = "Found {.fn {fn_name}} in {.pkg {result_components[[1]]}}",
+      "v" = "Opening {cli::col_green(result_components[[1]])}"
+    )))
 
     return(list(
       file = result_components[[1]],
@@ -88,7 +108,12 @@ git_grep <- function(fn_name) {
       col = 1
     ))
   }
-
+  # prioritise the first function in the R folder.
+  if (length(grep("^R/", result, value = TRUE)[[1]]) > 0) {
+    selected_result <- grep("^R/", result, value = TRUE)[[1]]
+  } else {
+    selected_result <- result[[1]]
+  }
   all_files <- sapply(strsplit(result, ":"), "[[", 1)
   selected_components <- strsplit(selected_result, ":")[[1]]
 

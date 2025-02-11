@@ -115,12 +115,16 @@ write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder
   if (file.exists(target_file) &&
       (.fnmate_env$previous_call %||% "") != fn_name) {
     .fnmate_env$previous_call = fn_name
-    message(target_file, " already exists. Call fnmate again on this function to overwrite file.")
+    message(cli::format_message(c(
+      " " = "",
+      "!" = "{target_file}, already exists. Call fnmate again on this function to overwrite file.")))
     return(invisible(target_file))
   }
 
   readr::write_file(x = fn_defn, file = target_file)
-  message("fnmate Wrote ", target_file)
+  message(cli::format_message(c(
+    " " = "",
+    "v" = "fnmate Wrote {col_green(target_file)}")))
   .fnmate_env$previous_call <- NULL
 
   invisible(target_file)
@@ -166,8 +170,8 @@ build_external_roxygen <- function(fn_arg_names) {
                   "#' @title")
 
   params <-
-    purrr::map_chr(fn_arg_names, ~glue::glue("#' @param {.x}")) %>%
-    paste0(collapse="\n")
+    purrr::map_chr(fn_arg_names, ~ glue::glue("#' @param {.x}")) |>
+    paste0(collapse = "\n")
 
   tail <-
     glue::glue(
