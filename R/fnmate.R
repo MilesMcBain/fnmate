@@ -117,18 +117,44 @@ fn_defn_from_cursor <- function(text, index, external = TRUE) {
 
 write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder") %||% "R") {
 
-  if (!dir.exists(fn_folder)) dir.create(fn_folder, recursive = TRUE)
+
+  ## If file already exists, bail without writing.
+  ## But in both cases remember name of function and set it up it so that if user
+  ## calls again file will be forced to be written (or overwritten).
 
   target_file <- file.path(fn_folder, paste0(fn_name, ".R"))
-
-  ## If file already exists, bail without writing, but set it up so that if user
-  ## calls again existing file will be overwritten.
   if (file.exists(target_file) &&
     (.fnmate_env$previous_call %||% "") != fn_name) {
     .fnmate_env$previous_call <- fn_name
-    message(target_file, " already exists. Call fnmate again on this function to overwrite file.")
+    rlang::inform(
+      glue::glue("{target_file} already exists. Call fnmate again on this function to overwrite file."),
+      class = "target_file_already_exists"
+    )
     return(invisible(target_file))
   }
+
+  if (is_loaded_function(fn_name) &&
+      (.fnmate_env$previous_call %||% "") != fn_name) {
+    .fnmate_env$previous_call <- fn_name
+    rlang::inform(
+      glue::glue(
+        "A function with name {fn_name} is already available in your environment.",
+        "Call fnmate again on this function to create a new local definition that may override it."
+      ),
+      class = "function_name_already_in_environment"
+    )
+    return(invisible(fn_name))
+  }
+
+  if (is_banned_name(fn_name)) {
+    rlang::inform(
+      glue::glue("No function definition to be created for {fn_name}: it is banned by option 'fnmate_banned_names'"),
+      class = "function_name_is_banned"
+    )
+    return(invisible(fn_name))
+  }
+
+  if (!dir.exists(fn_folder)) dir.create(fn_folder, recursive = TRUE)
 
   readr::write_file(x = fn_defn, file = target_file)
   message("fnmate Wrote ", target_file)
