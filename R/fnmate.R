@@ -29,8 +29,10 @@ fnmate_fn.R <- function(text, index) {
   index <- truncated_input$index
   assert_length_1(text)
   fnmate_target <- fn_defn_from_cursor(text, index, external = TRUE)
-  write_fn_file(fnmate_target$fn_name,
-                fnmate_target$fn_defn)
+  write_fn_file(
+    fnmate_target$fn_name,
+    fnmate_target$fn_defn
+  )
 
 }
 
@@ -81,15 +83,22 @@ fn_defn_from_cursor <- function(text, index, external = TRUE) {
   fn_arg_names[unnamed_args] <- paste0("nameme", seq(sum(unnamed_args)))
   fn_arg_names[name_is_arg] <- as.character(fn_args[name_is_arg])
   fn_arg_list <-
-    purrr::pmap_chr(list(name = fn_arg_names,
-                         arg = fn_args,
-                         name_is_arg = name_is_arg),
-                    function(name, arg, name_is_arg) {
+    purrr::pmap_chr(
+      list(
+        name = fn_arg_names,
+        arg = fn_args,
+        name_is_arg = name_is_arg
+      ),
+      function(name, arg, name_is_arg) {
 
-                      if (!name_is_arg) paste0(name, " = ", deparse_one_string(arg))
-                      else name
+        if (!name_is_arg) {
+          paste0(name, " = ", deparse_one_string(arg))
+        } else {
+          name
+        }
 
-                    })
+      }
+    )
 
   body <- build_fn_body(fn_name, fn_arg_list)
   if (external) {
@@ -100,21 +109,23 @@ fn_defn_from_cursor <- function(text, index, external = TRUE) {
 
   fn_text <- paste0(c(roxygen, body), collapse = "\n")
 
-  list(fn_name = fn_name,
-       fn_defn = fn_text)
+  list(
+    fn_name = fn_name,
+    fn_defn = fn_text
+  )
 }
 
 write_fn_file <- function(fn_name, fn_defn, fn_folder = getOption("fnmate_folder") %||% "R") {
 
   if (!dir.exists(fn_folder)) dir.create(fn_folder, recursive = TRUE)
 
-  target_file <- file.path(fn_folder,paste0(fn_name,".R"))
+  target_file <- file.path(fn_folder, paste0(fn_name, ".R"))
 
   ## If file already exists, bail without writing, but set it up so that if user
   ## calls again existing file will be overwritten.
   if (file.exists(target_file) &&
-      (.fnmate_env$previous_call %||% "") != fn_name) {
-    .fnmate_env$previous_call = fn_name
+    (.fnmate_env$previous_call %||% "") != fn_name) {
+    .fnmate_env$previous_call <- fn_name
     message(target_file, " already exists. Call fnmate again on this function to overwrite file.")
     return(invisible(target_file))
   }
@@ -138,15 +149,21 @@ build_fn_body <- function(fn_name, fn_arg_list) {
   ## indent any wrapped lines
   if (length(args > 1)) {
     to_indent <- seq_along(args)[-1]
-    args[to_indent] <- paste0(strrep(" ", nchar(definition)),
-                              args[to_indent])
+    args[to_indent] <- paste0(
+      strrep(" ", nchar(definition)),
+      args[to_indent]
+    )
     args <- paste0(args, collapse = "\n")
   }
 
   content <- getOption("fnmate_placeholder") %||% "NULL"
 
-  glue::glue(definition, args, ") {{\n\n  {content}\n\n}}\n",
-             .trim = FALSE)
+  glue::glue(
+    definition,
+    args,
+    ") {{\n\n  {content}\n\n}}\n",
+    .trim = FALSE
+  )
 }
 
 
@@ -159,21 +176,23 @@ build_internal_roxygen <- function() {
 build_external_roxygen <- function(fn_arg_names) {
 
   head <- glue::glue(
-                  "#' .. content for \\description{{}} (no empty lines) ..\n",
-                  "#'\n",
-                  "#' .. content for \\details{{}} ..\n",
-                  "#'\n",
-                  "#' @title")
+    "#' .. content for \\description{{}} (no empty lines) ..\n",
+    "#'\n",
+    "#' .. content for \\details{{}} ..\n",
+    "#'\n",
+    "#' @title"
+  )
 
   params <-
-    purrr::map_chr(fn_arg_names, ~glue::glue("#' @param {.x}")) %>%
-    paste0(collapse="\n")
+    purrr::map_chr(fn_arg_names, ~ glue::glue("#' @param {.x}")) %>%
+    paste0(collapse = "\n")
 
   tail <-
     glue::glue(
-            "#' @return\n",
-            "#' @author {get_git_user_name()}\n",
-            "#' @export")
+      "#' @return\n",
+      "#' @author {get_git_user_name()}\n",
+      "#' @export"
+    )
 
   paste0(c(head, params, tail), collapse = "\n")
 
@@ -185,20 +204,22 @@ locate_fn_target <- function(text, index) {
 
   matches <-
     gregexpr(function_open_pattern, text)[[1]] %>%
-    purrr::keep(~. <= index)
+    purrr::keep(~ . <= index)
 
   if (identical(matches, -1)) stop("fnmate couldn't find a parsable function at cursor.")
 
   match_row_col <-
-    purrr::map(matches, ~index_to_row_col(text, .x))
+    purrr::map(matches, ~ index_to_row_col(text, .x))
 
   fn_candidate_spans <-
-    purrr::map(matches,
-               ~parse_from_idx(text, .x)) %>%
+    purrr::map(
+      matches,
+      ~ parse_from_idx(text, .x)
+    ) %>%
     purrr::map(first_fn_expr)
 
   candidates <-
-   !purrr::map_lgl(fn_candidate_spans, is.null)
+    !purrr::map_lgl(fn_candidate_spans, is.null)
 
   candidate_matches <-
     matches[candidates]
@@ -213,54 +234,68 @@ locate_fn_target <- function(text, index) {
     purrr::discard(is.null)
 
   fn_candidate_text_coords <-
-    purrr::map2(fn_candidate_spans,
-                match_row_col,
-         function(candidate_span, candidate_index){
-           candidate_span$line1 <-
-            candidate_index$row
-           candidate_span$col1 <-
-             candidate_index$col
-           candidate_span$line2 <-
-             candidate_span$line2 + candidate_index$row - 1
-           candidate_span$col2 <-
-             ifelse(candidate_span$line1 == candidate_span$line2,
-                    candidate_span$col2 + candidate_index$col -1,
-                    candidate_span$col2)
-           candidate_span
-         })
+    purrr::map2(
+      fn_candidate_spans,
+      match_row_col,
+      function(candidate_span, candidate_index) {
+        candidate_span$line1 <-
+          candidate_index$row
+        candidate_span$col1 <-
+          candidate_index$col
+        candidate_span$line2 <-
+          candidate_span$line2 + candidate_index$row - 1
+        candidate_span$col2 <-
+          ifelse(
+            candidate_span$line1 == candidate_span$line2,
+            candidate_span$col2 + candidate_index$col - 1,
+            candidate_span$col2
+          )
+        candidate_span
+      }
+    )
 
   fn_target_location <-
     fn_candidate_text_coords %>%
-    purrr::keep(~span_contains(.x, index_row_col)) %>%
+    purrr::keep(~ span_contains(.x, index_row_col)) %>%
     utils::tail(1)
 
   if (length(fn_target_location) == 0) stop("fnmate couldn't find a parsable function at cursor.")
 
   fn_target_location <- fn_target_location[[1]]
 
-  substring(text,
-            row_col_to_index(text,
-                             fn_target_location$line1,
-                             fn_target_location$col1),
-            row_col_to_index(text,
-                             fn_target_location$line2,
-                             fn_target_location$col2))
+  substring(
+    text,
+    row_col_to_index(
+      text,
+      fn_target_location$line1,
+      fn_target_location$col1
+    ),
+    row_col_to_index(
+      text,
+      fn_target_location$line2,
+      fn_target_location$col2
+    )
+  )
 }
 
 parse_safely <- purrr::safely(parse)
 
 parse_from_idx <- function(text, index) {
   target_text <- substring(text, index)
-  tstfile = srcfile(tempfile())
-  parse_safely(text = target_text,
-               keep.source = TRUE,
-               srcfile = tstfile)
+  tstfile <- srcfile(tempfile())
+  parse_safely(
+    text = target_text,
+    keep.source = TRUE,
+    srcfile = tstfile
+  )
   utils::getParseData(tstfile)
 }
 
 first_fn_expr <- function(parse_data) {
 
-  if (!root_is_complete_function(parse_data)) return(NULL)
+  if (!root_is_complete_function(parse_data)) {
+    return(NULL)
+  }
   first_function_parent_expression <- first_function_parent(parse_data)
   first_function_parent_expression
 
@@ -273,9 +308,9 @@ root_is_complete_function <- function(parse_data) {
 
 first_function_parent <- function(parse_data) {
   symbol_parent_id <-
-    parse_data[parse_data$token == "SYMBOL_FUNCTION_CALL",]$parent[[1]]
+    parse_data[parse_data$token == "SYMBOL_FUNCTION_CALL", ]$parent[[1]]
 
-  expression_parent_id <- 
+  expression_parent_id <-
     parse_data[parse_data$id == symbol_parent_id, ]$parent[[1]]
 
   ## The expr we want is actually the grandparent. The parent is an expr for
@@ -287,13 +322,13 @@ first_function_parent <- function(parse_data) {
 
 index_to_row_col <- function(text, index) {
 
-  line_ends<- gregexpr("\\n", text)[[1]]
+  line_ends <- gregexpr("\\n", text)[[1]]
   line_num <- sum((line_ends < index)) + 1
   ## + 1 since first line doesn't have a \n before it.
 
   col_num <- suppressWarnings(
     index - max(max(line_ends[line_ends < index]), 0)
-  )  ## if there are no line ends inner max returns -inf
+  ) ## if there are no line ends inner max returns -inf
 
   list(row = line_num, col = col_num)
 
@@ -301,24 +336,31 @@ index_to_row_col <- function(text, index) {
 
 row_col_to_index <- function(text, row, col) {
   line_end_locs <- gregexpr("\\n", text)[[1]]
-  ifelse(row == 1,
-         col,
-         line_end_locs[row - 1] + col)
+  ifelse(
+    row == 1,
+    col,
+    line_end_locs[row - 1] + col
+  )
 }
 
 span_contains <- function(span, index) {
   within_line_span <-
     span$line1 <= index$row &&
-    span$line2 >= index$row
+      span$line2 >= index$row
 
   single_line_span <- span$line1 == span$line2
   on_first_line <- index$row == span$line1
   on_last_line <- index$row == span$line2
 
-  if(single_line_span) within_col_span <- index$col >= span$col1 && index$col <= span$col2  
-  else if (on_first_line) within_col_span <- index$col >= span$col1
-  else if (on_last_line) within_col_span <- index$col <= span$col2
-  else within_col_span <- within_line_span
+  if (single_line_span) {
+    within_col_span <- index$col >= span$col1 && index$col <= span$col2
+  } else if (on_first_line) {
+    within_col_span <- index$col >= span$col1
+  } else if (on_last_line) {
+    within_col_span <- index$col <= span$col2
+  } else {
+    within_col_span <- within_line_span
+  }
 
   within_line_span && within_col_span
 }
@@ -331,7 +373,7 @@ deparse_one_string <- function(code) {
   char_vec <- deparse(code, width.cutoff = 500)
   char_vec_clean <- gsub("^\\s+", "\\s", char_vec)
   paste0(char_vec_clean, collapse = "")
-} 
+}
 
 truncate_to_chunk_boundary <- function(text, index) {
 
@@ -347,23 +389,26 @@ truncate_to_chunk_boundary <- function(text, index) {
   }
 
   if (length(lower_fence) == 0) {
-    lower_fence <-  1
+    lower_fence <- 1
   } else {
     lower_fence <- lower_fence + 3
   }
 
   list(
     index = index - (lower_fence - 1),
-    text = substring(text,
-                     first = lower_fence,
-                     last = upper_fence)
+    text = substring(
+      text,
+      first = lower_fence,
+      last = upper_fence
+    )
   )
 
 }
 
 assert_length_1 <- function(text) {
 
-  if(length(text) !=  1)
+  if (length(text) != 1) {
     stop("text is expected to be a length 1 character vector. Its length was: ", length(text))
+  }
 
 }
