@@ -70,6 +70,7 @@ There are some options that affect how `fnmate` works:
   * `fmate_searcher` is the grep tool to use for the function definition jumping helper. Valid options are `"rg"` (ripgrep), and `"git_grep"`.
   * `fnmate_quote_jump_regex` can be set to `TRUE` if `Jump to function definiton` is not working due to an error in the command. This seems necessary on MacOS and Linux, depending on the shell version.
   * `fnmate_banned_names` is a character vector of function names that will never have defintions generated for them. Handy if you accidentally find yourself generating definitions for things like `tar_target()`
+  * `fnmate_generate_roxygen` is a logical that controls whether a Roxygen documentation template is generated. Defaults to `TRUE`.
 
 You can modify any of these options by running, for example, `options(fnmate_quote_jump_regex = TRUE)` in your R session or in your `.Rprofile`.
 

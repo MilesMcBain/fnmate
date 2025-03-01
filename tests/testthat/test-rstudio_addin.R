@@ -79,4 +79,29 @@ test_that("text around cursor for addin works", {
 
   expect_equal(window_around_cursor(context_mock2)$text,
                "c(\nfoo\n)\n")
+  cursor_context <- window_around_cursor(context_mock)
+
+  # definition for func3
+  # with roxygen by default
+  function_def <- fn_defn_from_cursor(cursor_context$text, cursor_context$index)
+  expect_true(
+    grepl("func3 <- function\\(arg4\\)", function_def$fn_defn)
+  )
+  expect_true(
+    grepl("#' @param", function_def$fn_defn)
+  )
+
+  # definition for func3 without roxygen:
+    withr::with_options(
+      list(
+        fnmate_generate_roxygen = FALSE
+      ),
+      {
+        function_def <- fn_defn_from_cursor(cursor_context$text, cursor_context$index)
+        expect_false(
+          grepl("#' @param", function_def$fn_defn)
+        )
+      }
+    )
+
 })

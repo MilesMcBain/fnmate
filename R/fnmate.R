@@ -67,7 +67,7 @@ fnmate_below <- function(text, index) {
 
 }
 
-fn_defn_from_cursor <- function(text, index, external = TRUE) {
+fn_defn_from_cursor <- function(text, index, external = getOption("fnmate_generate_roxygen", TRUE)) {
   target <- locate_fn_target(text, index)
 
   expression <- as.list(rlang::parse_expr(target))
