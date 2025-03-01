@@ -1,6 +1,3 @@
-new_fun(abc)
-
-
 is_loaded_function <- function(fn_name) {
   matching_function_loaded <-
     mget(as.character(fn_name), envir = .GlobalEnv, inherits = TRUE, ifnotfound = list(NULL)) |>
