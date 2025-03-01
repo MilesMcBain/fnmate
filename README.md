@@ -1,4 +1,4 @@
-[![Travis build status](https://travis-ci.org/MilesMcBain/fnmate.svg?branch=master)](https://travis-ci.org/MilesMcBain/fnmate) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/MilesMcBain/fnmate?branch=master&svg=true)](https://ci.appveyor.com/project/MilesMcBain/fnmate)
+[![fnmate status badge](https://milesmcbain.r-universe.dev/fnmate/badges/version)](https://milesmcbain.r-universe.dev/fnmate)
 
 # Your fnmate
 
