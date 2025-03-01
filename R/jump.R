@@ -117,8 +117,8 @@ process_grep_results <- function(grep_results, fn_name, jump_start_file) {
         preferred_results,
         results_pieces[descendant_results],
         results_pieces[!descendant_results]
-      ) |>
-        _[[1]]
+      ) %>%
+        .[[1]]
 
       rlang::inform(
         glue::glue("Jumping to {jump_target[[1]]}")

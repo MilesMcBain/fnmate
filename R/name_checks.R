@@ -1,7 +1,7 @@
 is_loaded_function <- function(fn_name) {
   matching_function_loaded <-
-    mget(as.character(fn_name), envir = .GlobalEnv, inherits = TRUE, ifnotfound = list(NULL)) |>
-    unlist() |>
+    mget(as.character(fn_name), envir = .GlobalEnv, inherits = TRUE, ifnotfound = list(NULL)) %>%
+    unlist() %>%
     not_null()
 
   matching_function_loaded
