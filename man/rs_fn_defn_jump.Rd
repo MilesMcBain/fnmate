@@ -7,7 +7,7 @@
 rs_fn_defn_jump(context = rstudioapi::getActiveDocumentContext())
 }
 \arguments{
-\item{context}{the active document context from {rstudioapi}}
+\item{context}{the active document context from [rstudioapi]}
 }
 \value{
 nothing

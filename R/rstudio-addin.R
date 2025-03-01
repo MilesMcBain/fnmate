@@ -97,7 +97,7 @@ rs_fnmate_clip <- function(context = rstudioapi::getActiveDocumentContext()) {
 ##' Search for a local function definion matching the function the cursor is
 ##' on, and jump to it, if found.
 ##'
-##' @param context the active document context from {rstudioapi}
+##' @param context the active document context from [rstudioapi]
 ##'
 ##' @author Miles McBain
 ##' @return nothing
