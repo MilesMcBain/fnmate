@@ -403,10 +403,10 @@ deparse_one_string <- function(code) {
 
 truncate_to_chunk_boundary <- function(text, index) {
 
-  tripple_ticks <- gregexpr("```", text, perl = TRUE)[[1]]
+  triple_ticks <- gregexpr("```", text, perl = TRUE)[[1]]
 
-  upper_fence <- tripple_ticks[utils::head(which(tripple_ticks > index), 1)]
-  lower_fence <- tripple_ticks[utils::tail(which(tripple_ticks < index), 1)]
+  upper_fence <- triple_ticks[utils::head(which(triple_ticks > index), 1)]
+  lower_fence <- triple_ticks[utils::tail(which(triple_ticks > 0 & triple_ticks < index), 1)]
 
   if (length(upper_fence) == 0) {
     upper_fence <- nchar(text)
