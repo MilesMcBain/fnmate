@@ -71,6 +71,7 @@ There are some options that affect how `fnmate` works:
   * `fnmate_quote_jump_regex` can be set to `TRUE` if `Jump to function definiton` is not working due to an error in the command. This seems necessary on MacOS and Linux, depending on the shell version.
   * `fnmate_banned_names` is a character vector of function names that will never have defintions generated for them. Handy if you accidentally find yourself generating definitions for things like `tar_target()`
   * `fnmate_generate_roxygen` is a logical that controls whether a Roxygen documentation template is generated. Defaults to `TRUE`.
+  * `fnmate_preferred_jump_paths` a glob that is matched to paths when performing a jump to function definition to determine if they should have priority for a jump target, in the case where multiple matching definitions are found. So `"R/*.R"` would prefer R sources in your R folder.
 
 You can modify any of these options by running, for example, `options(fnmate_quote_jump_regex = TRUE)` in your R session or in your `.Rprofile`.
 

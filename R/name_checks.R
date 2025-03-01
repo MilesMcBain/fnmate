@@ -14,4 +14,3 @@ is_banned_name <- function(fn_name) {
 not_null <- function(x) {
   !is.null(x)
 }
-

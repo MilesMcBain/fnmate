@@ -118,5 +118,7 @@ rs_fn_defn_jump <- function(context = rstudioapi::getActiveDocumentContext()) {
   expression <- as.list(rlang::parse_expr(target))
 
   fn_name <- expression[[1]]
-  jump_fn_definiton(fn_name)
+  jump_fn_definiton(fn_name, jump_start_file = context$path)
 }
+
+
